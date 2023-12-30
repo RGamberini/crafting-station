@@ -96,6 +96,10 @@ repositories{
         name = "Progwml6 maven"
         url = "https://dvs1.progwml6.com/files/maven/"
     }
+    maven {
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
     maven { url "https://maven.shedaniel.me/" }
 
 }
@@ -113,10 +117,12 @@ dependencies {
     // compile "some.group:artifact:version"
    // compile fg.deobf("curse.maven:dank-storage-335673:3586635")
 
-    implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:$rei_version")
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:$rei_version")
 
     implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:$cloth_config_version")
     implementation fg.deobf("dev.architectury:architectury-forge:$architectury_version")
+
+    implementation fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
     // Real examples
     // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
