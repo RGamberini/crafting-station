@@ -17,4 +17,5 @@ public class JeiClientPlugin implements IModPlugin {
     @Override
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
         registration.addRecipeTransferHandler(new TransferHandler());
+    }
 }

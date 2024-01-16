@@ -1,8 +1,13 @@
 package tfar.craftingstation.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import org.joml.Quaternionf;
 import tfar.craftingstation.Configs;
+import tfar.craftingstation.CraftingStationBlock;
 import tfar.craftingstation.CraftingStationBlockEntity;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
@@ -18,6 +23,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.properties.SlabType;
 
 public class CraftingStationBlockEntityRenderer implements BlockEntityRenderer<CraftingStationBlockEntity> {
+
+  private float _blockScale = 0.25f;
+  private float _itemScale = 0.125f;
 
   public CraftingStationBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
 
@@ -41,13 +49,23 @@ public class CraftingStationBlockEntityRenderer implements BlockEntityRenderer<C
         ItemStack item = blockEntity.input.getStackInSlot(j + 3 * i);
         if (item.isEmpty()) continue;
 
+        boolean isItem = !(item.getItem() instanceof BlockItem);
+
         //pushmatrix
         matrixStack.pushPose();
-        //translate x,y,z
-        matrixStack.translate(spacing * i +offset, 0, spacing * j +offset);
-        //matrixStack.mulPose(Vector3f.YP.rotation(0));
+        matrixStack.translate(0.5, 0.5, 0.5);
+        matrixStack.mulPose((new Quaternionf()).rotationY(getRotation(state.getValue(CraftingStationBlock.FACING)) * ((float)Math.PI / 180F)));
+        matrixStack.translate(-0.5, -0.5, -0.5);
+        //translate x,y,z (invert direction of j to correct the positioning on the table)
+        matrixStack.translate(spacing * i + offset, isItem ? -0.05 : 0, spacing * (2-j) + offset);
+        matrixStack.mulPose((new Quaternionf()).rotationY(270 * ((float)Math.PI / 180F)));
         //scale x,y,z
-        matrixStack.scale(0.25F, 0.25F, 0.25F);
+        float scale = isItem ? _itemScale : _blockScale;
+        matrixStack.scale(scale, scale, scale);
+
+        if (isItem) {
+          matrixStack.mulPose((new Quaternionf()).rotationX(90 * ((float)Math.PI / 180F)));
+        }
 
         BakedModel bakedmodel = Minecraft.getInstance().getItemRenderer()
                 .getModel(item, blockEntity.getLevel(), null, 0);
@@ -60,5 +78,16 @@ public class CraftingStationBlockEntityRenderer implements BlockEntityRenderer<C
         matrixStack.popPose();
       }
     }
+  }
+
+  //The original positioning wasn't done great and I don't have the spoons to fix it right now, so this is a workaround.
+  private int getRotation(Direction dir) {
+    switch (dir) {
+      case NORTH -> { return 270; }
+      case EAST  -> { return 180; }
+      case SOUTH -> { return 90; }
+      case WEST  -> { return 0; }
+    }
+    return 0;
   }
 }

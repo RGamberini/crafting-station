@@ -5,9 +5,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -47,6 +49,7 @@ public class CraftingStation {
         iEventBus.addListener(this::enqueueIMC);
         iEventBus.addListener(ModDatagen::gather);
         iEventBus.addListener(RegistryEvents::block);
+        iEventBus.addListener(RegistryEvents::addCreative);
     }
 
     public static final Configs.Server SERVER;
@@ -89,6 +92,14 @@ public class CraftingStation {
             event.register(Registries.ITEM, modLoc("crafting_station_slab"), () -> new BlockItem(ModBlocks.crafting_station_slab, properties));
             event.register(Registries.MENU, modLoc("crafting_station"), () -> ModMenuTypes.crafting_station);
             event.register(Registries.BLOCK_ENTITY_TYPE, modLoc("crafting_station"), () -> ModBlockEntityTypes.crafting_station);
+        }
+
+        @SubscribeEvent
+        public static void addCreative(BuildCreativeModeTabContentsEvent event) {
+            if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+                event.accept(ModBlocks.crafting_station);
+                event.accept(ModBlocks.crafting_station_slab);
+            }
         }
 
         public static ResourceLocation modLoc(String s) {

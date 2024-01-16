@@ -1,7 +1,9 @@
 package tfar.craftingstation;
 
+import com.illusivesoulworks.polymorph.common.crafting.RecipeSelection;
 import net.minecraft.world.inventory.*;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.fml.loading.FMLLoader;
 import tfar.craftingstation.init.ModMenuTypes;
 import tfar.craftingstation.network.PacketHandler;
 import tfar.craftingstation.network.S2CLastRecipePacket;
@@ -155,7 +157,10 @@ public class CraftingStationMenu extends AbstractContainerMenu {
         }
     }
 
-    public static Recipe<CraftingContainer> findRecipe(CraftingContainer inv, Level world, Player player) {
+    public static Recipe<CraftingContainer> findRecipe(CraftingStationMenu menu, CraftingContainer inv, Level world, Player player) {
+        if (ModList.get().isLoaded("polymorph")) {
+            return RecipeSelection.getPlayerRecipe(menu, RecipeType.CRAFTING, inv, world, player).stream().findFirst().orElse(null);
+        }
         return world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING,inv,world).stream().findFirst().orElse(null);
     }
 
@@ -223,16 +228,6 @@ public class CraftingStationMenu extends AbstractContainerMenu {
             addSlot(new Slot(playerInventory, x, 8 + 18 * x, 142));
         }
     }
-
-    // update crafting
-    //clientside only
-    //@Override
-    //public void setAll(List<ItemStack> p_190896_1_) {
-    //    craftMatrix.setDoNotCallUpdates(true);
-    //    super.setAll(p_190896_1_);
-     //   craftMatrix.setDoNotCallUpdates(false);
-     //   craftMatrix.onCraftMatrixChanged();
-   // }
 
     @Override
     public void slotsChanged(Container inventory) {
@@ -358,10 +353,16 @@ public class CraftingStationMenu extends AbstractContainerMenu {
     protected void slotChangedCraftingGrid(Level world, Player player, CraftingContainer inv, ResultContainer result) {
         ItemStack itemstack = ItemStack.EMPTY;
 
-        // if the recipe is no longer valid, update it
-        if (lastRecipe == null || !lastRecipe.matches(inv, world)) {
-            lastRecipe = findRecipe(inv, world, player);
+        //If polymorph is installed we have to check earlier; the original caching doesn't detect the changed selection. Else, continue as previous.
+        if (ModList.get().isLoaded("polymorph")) {
+            lastRecipe = findRecipe(this, inv, world, player);
+        } else {
+            // if the recipe is no longer valid, update it
+            if (lastRecipe == null || !lastRecipe.matches(inv, world)) {
+                lastRecipe = findRecipe(this, inv, world, player);
+            }
         }
+
 
         // if we have a recipe, fetch its result
         if (lastRecipe != null) {
