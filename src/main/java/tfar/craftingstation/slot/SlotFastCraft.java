@@ -1,6 +1,8 @@
 
 package tfar.craftingstation.slot;
 
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import tfar.craftingstation.CraftingInventoryPersistant;
 import tfar.craftingstation.CraftingStationMenu;
 import net.minecraft.core.NonNullList;
@@ -17,12 +19,15 @@ import net.minecraft.world.item.ItemStack;
  * Basically it makes crafting less laggy
  */
 public class SlotFastCraft extends ResultSlot {
-
+  private final Inventory playerInventory;
+  private final NonNullList<Slot> sideSlots;
   private final CraftingStationMenu container;
   protected CraftingInventoryPersistant craftingInventoryPersistant;
 
-  public SlotFastCraft(CraftingStationMenu container, CraftingInventoryPersistant craftingInventoryPersistant, Container resultInventory, int slotIndex, int xPosition, int yPosition, Player player) {
+  public SlotFastCraft(CraftingStationMenu container, CraftingInventoryPersistant craftingInventoryPersistant, Container resultInventory, int slotIndex, int xPosition, int yPosition, Player player, NonNullList<Slot> slots) {
     super(player, craftingInventoryPersistant, resultInventory, slotIndex, xPosition, yPosition);
+    this.playerInventory = player.getInventory();
+    this.sideSlots = slots;
     this.container = container;
     this.craftingInventoryPersistant = craftingInventoryPersistant;
   }
@@ -52,9 +57,9 @@ public class SlotFastCraft extends ResultSlot {
   public void onTake(Player thePlayer, ItemStack craftingResult) {
     this.checkTakeAchievements(craftingResult);
     net.minecraftforge.common.ForgeHooks.setCraftingPlayer(thePlayer);
-    /* CHANGE BEGINS HERE */
+
     NonNullList<ItemStack> nonnulllist = container.getRemainingItems();
-    /* END OF CHANGE */
+
     net.minecraftforge.common.ForgeHooks.setCraftingPlayer(null);
 
     // note: craftMatrixPersistent and this.craftSlots are the same object!
@@ -65,7 +70,24 @@ public class SlotFastCraft extends ResultSlot {
       ItemStack stack1 = nonnulllist.get(i);
 
       if (!stackInSlot.isEmpty()) {
-        this.craftSlots.removeItem(i, 1);
+        int sideInvMatchingIndex = -1;
+        for (int j = 10; j < sideSlots.size(); j++) {
+          if (sideSlots.get(j).hasItem() && ItemStack.isSameItemSameTags(sideSlots.get(j).getItem(), stackInSlot)) {
+              sideInvMatchingIndex = j;
+              break;
+          }
+        }
+        int playerInvMatchingIndex = playerInventory.findSlotMatchingItem(stackInSlot);
+
+        if(stackInSlot.getCount() > 1) {
+          this.craftSlots.removeItem(i, 1);
+        } else if(playerInvMatchingIndex > 0) {
+          this.playerInventory.removeItem(playerInvMatchingIndex, 1);
+        } else if(sideInvMatchingIndex > 0) {
+          this.sideSlots.get(sideInvMatchingIndex).getItem().shrink(1);
+        } else {
+          this.craftSlots.removeItem(i, 1);
+        }
         stackInSlot = this.craftSlots.getItem(i);
       }
 

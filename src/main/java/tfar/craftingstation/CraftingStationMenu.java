@@ -170,7 +170,7 @@ public class CraftingStationMenu extends AbstractContainerMenu {
 
     private void addOwnSlots() {
         // crafting result
-        this.addSlot(new SlotFastCraft(this, this.craftMatrix, craftResult, 0, 124, 35, player));
+        this.addSlot(new SlotFastCraft(this, this.craftMatrix, craftResult, 0, 124, 35, player, slots));
 
         // crafting grid
         for (int y = 0; y < 3; y++) {
