@@ -3,6 +3,8 @@
   "block.craftingstation.crafting_station_slab": "Crafting Station Slab",
   "title.crafting_station": "Crafting Station",
   "text.crafting_station.error": "Bad recipe %s found, see log for details",
-  "text.crafting_station.clear": "Clear crafting grid"
+  "text.crafting_station.clear": "Clear crafting grid",
+  "text.crafting_station.connected_resources.true": "Use Connected Resources: True",
+  "text.crafting_station.connected_resources.false": "Use Connected Resources: False"
 
 }

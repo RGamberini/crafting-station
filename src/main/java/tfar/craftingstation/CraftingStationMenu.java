@@ -1,6 +1,7 @@
 package tfar.craftingstation;
 
 import com.illusivesoulworks.polymorph.common.crafting.RecipeSelection;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.*;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -72,6 +73,8 @@ public class CraftingStationMenu extends AbstractContainerMenu {
     protected Recipe<CraftingContainer> lastLastRecipe;
 
     protected DataSlot slot;
+
+    public boolean useConnectedResources = true;
 
     private static BlockEntity getTileEntityAtPos(BlockPos pos, Level world) {
         try {
