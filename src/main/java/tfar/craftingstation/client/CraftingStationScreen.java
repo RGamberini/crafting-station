@@ -50,13 +50,12 @@ public class CraftingStationScreen extends AbstractContainerScreen<CraftingStati
         addRenderableWidget(new TabButton(leftPos - 128 + 21 * i, topPos - 22, 22, 28, button -> changeContainer(((TabButton)button).index),i,menu.blocks.get(i),this));
       }
     }
+    PriorityButton priority = new PriorityButton(leftPos + 85, topPos + 16, 17, 17, this.menu, b -> {
+      PacketHandler.INSTANCE.sendToServer(new C2SPriorityPacket());
+      menu.useConnectedResources = !menu.useConnectedResources; //Make sure client visual updates alongside the server functionality
+    });
+    this.addRenderableWidget(priority);
     if (!ModList.get().isLoaded("craftingtweaks")) {
-      PriorityButton priority = new PriorityButton(leftPos + 85, topPos + 16, 17, 17, this.menu, b -> {
-        PacketHandler.INSTANCE.sendToServer(new C2SPriorityPacket());
-        menu.useConnectedResources = !menu.useConnectedResources; //Make sure client visual updates alongside the server functionality
-      });
-      this.addRenderableWidget(priority);
-
       ClearButton clear = new ClearButton(priority.getX() + 19, topPos + 16, 13, 13, b -> PacketHandler.INSTANCE.sendToServer(new C2SClearPacket()));
       clear.setTooltip(Tooltip.create(Component.translatable("text.crafting_station.clear")));
       this.addRenderableWidget(clear);
