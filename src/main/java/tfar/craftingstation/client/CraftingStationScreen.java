@@ -198,5 +198,9 @@ public class CraftingStationScreen extends AbstractContainerScreen<CraftingStati
     menu.updateSlotPositions(topRow);
     if (!smooth) this.currentScroll = (double) topRow / (this.menu.getRows() - 9);
   }
+
+  public boolean hasSideContainer() {
+    return this.menu.hasSideContainers;
+  }
 }
 
