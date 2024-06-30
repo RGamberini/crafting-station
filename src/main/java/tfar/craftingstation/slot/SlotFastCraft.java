@@ -1,4 +1,3 @@
-
 package tfar.craftingstation.slot;
 
 import net.minecraft.world.entity.player.Inventory;
@@ -11,12 +10,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.item.ItemStack;
 
-
 /**
- * SlotCraftingSucks from FastWorkbench adapted for the Crafting Station container (no change in functionality)
+ * SlotCraftingSucks from FastWorkbench adapted for the Crafting Station container
  * See: https://github.com/Shadows-of-Fire/FastWorkbench/blob/master/src/main/java/shadows/fastbench/gui/SlotCraftingSucks.java
  * <p>
- * Basically it makes crafting less laggy
+ * Basically it makes crafting less laggy.
+ * There is one minor change to allow crafting station to prioritise inventory slots first.
+ * -
  */
 public class SlotFastCraft extends ResultSlot {
   private final Inventory playerInventory;
@@ -70,21 +70,25 @@ public class SlotFastCraft extends ResultSlot {
       ItemStack stack1 = nonnulllist.get(i);
 
       if (!stackInSlot.isEmpty()) {
-        int sideInvMatchingIndex = -1;
-        for (int j = 10; j < sideSlots.size(); j++) {
-          if (sideSlots.get(j).hasItem() && ItemStack.isSameItemSameTags(sideSlots.get(j).getItem(), stackInSlot)) {
+        if (container.useConnectedResources) {
+          int sideInvMatchingIndex = -1;
+          for (int j = 10; j < sideSlots.size(); j++) {
+            if (sideSlots.get(j).hasItem() && ItemStack.isSameItemSameTags(sideSlots.get(j).getItem(), stackInSlot)) {
               sideInvMatchingIndex = j;
               break;
+            }
           }
-        }
-        int playerInvMatchingIndex = playerInventory.findSlotMatchingItem(stackInSlot);
+          int playerInvMatchingIndex = playerInventory.findSlotMatchingItem(stackInSlot);
 
-        if(stackInSlot.getCount() > 1) {
-          this.craftSlots.removeItem(i, 1);
-        } else if(playerInvMatchingIndex > 0) {
-          this.playerInventory.removeItem(playerInvMatchingIndex, 1);
-        } else if(sideInvMatchingIndex > 0) {
-          this.sideSlots.get(sideInvMatchingIndex).getItem().shrink(1);
+          if(stackInSlot.getCount() > 1) {
+            this.craftSlots.removeItem(i, 1);
+          } else if(playerInvMatchingIndex > 0) {
+            this.playerInventory.removeItem(playerInvMatchingIndex, 1);
+          } else if(sideInvMatchingIndex > 0) {
+            this.sideSlots.get(sideInvMatchingIndex).getItem().shrink(1);
+          } else {
+            this.craftSlots.removeItem(i, 1);
+          }
         } else {
           this.craftSlots.removeItem(i, 1);
         }

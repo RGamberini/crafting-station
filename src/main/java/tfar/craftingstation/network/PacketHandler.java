@@ -21,5 +21,10 @@ public class PacketHandler {
             (c2SClearPacket, buffer) -> {},
             buffer -> new C2SClearPacket(),
             C2SClearPacket::handle);
+
+    INSTANCE.registerMessage(5, C2SPriorityPacket.class,
+            (c2SPriorityPacket, buffer) -> {},
+            buffer -> new C2SPriorityPacket(),
+            C2SPriorityPacket::handle);
   }
 }

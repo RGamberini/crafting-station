@@ -3,9 +3,11 @@ package tfar.craftingstation.client;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
+import org.apache.logging.log4j.core.net.Priority;
 import tfar.craftingstation.CraftingStation;
 import tfar.craftingstation.CraftingStationMenu;
 import tfar.craftingstation.network.C2SClearPacket;
+import tfar.craftingstation.network.C2SPriorityPacket;
 import tfar.craftingstation.network.PacketHandler;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
@@ -49,11 +51,14 @@ public class CraftingStationScreen extends AbstractContainerScreen<CraftingStati
       }
     }
     if (!ModList.get().isLoaded("craftingtweaks")) {
+      PriorityButton priority = new PriorityButton(leftPos + 85, topPos + 16, 17, 17, this.menu, b -> {
+        PacketHandler.INSTANCE.sendToServer(new C2SPriorityPacket());
+        menu.useConnectedResources = !menu.useConnectedResources; //Make sure client visual updates alongside the server functionality
+      });
+      this.addRenderableWidget(priority);
 
-      Tooltip tooltipC =  Tooltip.create(Component.translatable("text.crafting_station.clear"));
-
-      ClearButton clear =new ClearButton(leftPos + 85, topPos + 16,7,7, b -> PacketHandler.INSTANCE.sendToServer(new C2SClearPacket()));
-      clear.setTooltip(tooltipC);
+      ClearButton clear = new ClearButton(priority.getX() + 19, topPos + 16, 13, 13, b -> PacketHandler.INSTANCE.sendToServer(new C2SClearPacket()));
+      clear.setTooltip(Tooltip.create(Component.translatable("text.crafting_station.clear")));
       this.addRenderableWidget(clear);
     }
   }
