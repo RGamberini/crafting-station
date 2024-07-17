@@ -21,7 +21,8 @@ public class CraftingStationBlockEntity extends BlockEntity implements MenuProvi
 
   public CraftingStationItemHandler input;
 
- private int currentContainer = 0;
+  private int currentContainer = 0;
+  private boolean useConnectedResources = false;
 
  ContainerData data = new ContainerData() {
    @Override
@@ -50,20 +51,19 @@ public class CraftingStationBlockEntity extends BlockEntity implements MenuProvi
   public void saveAdditional(CompoundTag tag) {
     CompoundTag compound = this.input.serializeNBT();
     tag.put("inv", compound);
-    // if (this.customName != null) {
-    //   tag.putString("CustomName", ITextComponent.Serializer.toJson(this.customName));
-    //  }
+    tag.putBoolean("craftstyle", useConnectedResources);
   }
 
   @Override
   public void load(CompoundTag tag) {
     CompoundTag invTag = tag.getCompound("inv");
     input.deserializeNBT(invTag);
-    //  if (tag.contains("CustomName", 8)) {
-    //    this.customName = ITextComponent.Serializer.fromJson(tag.getString("CustomName"));
-    //   }
+    useConnectedResources = tag.getBoolean("craftstyle");
     super.load(tag);
   }
+
+  public boolean getUseConnectedResources() { return useConnectedResources; }
+  public void setUseConnectedResources(boolean use) { useConnectedResources = use; }
 
   @Nonnull
   @Override

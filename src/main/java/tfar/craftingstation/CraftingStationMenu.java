@@ -74,8 +74,6 @@ public class CraftingStationMenu extends AbstractContainerMenu {
 
     protected DataSlot slot;
 
-    public boolean useConnectedResources = true;
-
     private static BlockEntity getTileEntityAtPos(BlockPos pos, Level world) {
         try {
             return GET_TILE_ENTITY_METHOD != null ? (BlockEntity) GET_TILE_ENTITY_METHOD.invoke(null, pos, world) : world.getBlockEntity(pos);

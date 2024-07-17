@@ -17,11 +17,11 @@ public class PriorityButton extends WidgetButtonBase {
 
   @Override
   protected void renderButtonWidget() {
-    setTooltip(menu.useConnectedResources ? useResources : dontUseResources);
+    setTooltip(menu.tileEntity.getUseConnectedResources() ? useResources : dontUseResources);
   }
 
   @Override
   protected int getTextureX() {
-    return texStartX + (menu.useConnectedResources ? 0 : this.getWidth());
+    return texStartX + (menu.tileEntity.getUseConnectedResources() ? 0 : this.getWidth());
   }
 }

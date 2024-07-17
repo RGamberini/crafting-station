@@ -70,7 +70,7 @@ public class SlotFastCraft extends ResultSlot {
       ItemStack stack1 = nonnulllist.get(i);
 
       if (!stackInSlot.isEmpty()) {
-        if (container.useConnectedResources) {
+        if (container.tileEntity.getUseConnectedResources()) {
           int sideInvMatchingIndex = -1;
           for (int j = 10; j < sideSlots.size(); j++) {
             if (sideSlots.get(j).hasItem() && ItemStack.isSameItemSameTags(sideSlots.get(j).getItem(), stackInSlot)) {
@@ -86,6 +86,7 @@ public class SlotFastCraft extends ResultSlot {
             this.playerInventory.removeItem(playerInvMatchingIndex, 1);
           } else if(sideInvMatchingIndex > 0) {
             this.sideSlots.get(sideInvMatchingIndex).getItem().shrink(1);
+            this.sideSlots.get(sideInvMatchingIndex).container.setChanged();
           } else {
             this.craftSlots.removeItem(i, 1);
           }
@@ -109,7 +110,7 @@ public class SlotFastCraft extends ResultSlot {
 
     craftingInventoryPersistant.setDoNotCallUpdates(false);
     container.slotsChanged(craftingInventoryPersistant);
-
+    container.tileEntity.setChanged();
     //return craftingResult;
   }
 }

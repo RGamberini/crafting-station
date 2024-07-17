@@ -52,7 +52,6 @@ public class CraftingStationScreen extends AbstractContainerScreen<CraftingStati
     }
     PriorityButton priority = new PriorityButton(leftPos + 85, topPos + 16, 17, 17, this.menu, b -> {
       PacketHandler.INSTANCE.sendToServer(new C2SPriorityPacket());
-      menu.useConnectedResources = !menu.useConnectedResources; //Make sure client visual updates alongside the server functionality
     });
     this.addRenderableWidget(priority);
     if (!ModList.get().isLoaded("craftingtweaks")) {
