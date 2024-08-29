@@ -3,7 +3,8 @@ package tfar.craftingstation.client;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
-import org.apache.logging.log4j.core.net.Priority;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 import tfar.craftingstation.CraftingStation;
 import tfar.craftingstation.CraftingStationMenu;
 import tfar.craftingstation.network.C2SClearPacket;
@@ -33,6 +34,8 @@ public class CraftingStationScreen extends AbstractContainerScreen<CraftingStati
   private boolean isScrolling = false;
 
   private int topRow;
+  private boolean[] jeiWarningPages;
+  private InfoFakeButton info;
 
   public CraftingStationScreen(CraftingStationMenu p_i51094_1_, Inventory p_i51094_2_, Component p_i51094_3_) {
     super(p_i51094_1_, p_i51094_2_, p_i51094_3_);
@@ -43,12 +46,23 @@ public class CraftingStationScreen extends AbstractContainerScreen<CraftingStati
   protected void init() {
     super.init();
     if (this.menu.hasSideContainers) {
+      jeiWarningPages = new boolean[menu.containerStarts.size()];
       for (int i = 0; i < menu.containerStarts.size(); i++) {
-
-        Tooltip tab = null;//Tooltip.create((TabButton)button).stack, x, y);
-
         addRenderableWidget(new TabButton(leftPos - 128 + 21 * i, topPos - 22, 22, 28, button -> changeContainer(((TabButton)button).index),i,menu.blocks.get(i),this));
+        jeiWarningPages[i] = false;
+        Container container = menu.getContainerFromId(i);
+        for (int j = 0; j < container.getContainerSize(); j++) {
+          ItemStack item = container.getItem(j);
+          boolean modifiable = container.canPlaceItem(j, item) && container.canTakeItem(container, j, item);
+          if (!item.isEmpty() && !modifiable) {
+            jeiWarningPages[i] = true;
+          }
+        }
       }
+      info = new InfoFakeButton(leftPos - 14, topPos + 3, 12, 12, Component.literal("?"));
+      info.setTooltip(Tooltip.create(Component.translatable("text.crafting_station.jei_nopull_output")));
+      this.addRenderableWidget(info);
+      info.visible = jeiWarningPages[0];
     }
     PriorityButton priority = new PriorityButton(leftPos + 85, topPos + 16, 17, 17, this.menu, b -> {
       PacketHandler.INSTANCE.sendToServer(new C2SPriorityPacket());
@@ -68,7 +82,8 @@ public class CraftingStationScreen extends AbstractContainerScreen<CraftingStati
     return b;
   }
 
-  public void changeContainer(int container){
+  public void changeContainer(int container) {
+    info.visible = jeiWarningPages[container];
     this.menu.changeContainer(container);
   }
 

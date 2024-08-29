@@ -71,6 +71,7 @@ public class CraftingStationMenu extends AbstractContainerMenu {
     public int subContainerSize = 0;
     public boolean hasSideContainers;
     protected Recipe<CraftingContainer> lastLastRecipe;
+    List<BlockEntity> tileEntities;
 
     protected DataSlot slot;
 
@@ -118,7 +119,7 @@ public class CraftingStationMenu extends AbstractContainerMenu {
     protected void searchSideInventories(BlockPos pos) {
         // detect te
         Direction accessDir = null;
-        List<BlockEntity> tileEntities = new ArrayList<>();
+        tileEntities = new ArrayList<>();
         for (Direction dir : Direction.values()) {
             BlockPos neighbor = pos.relative(dir);
 
@@ -210,6 +211,13 @@ public class CraftingStationMenu extends AbstractContainerMenu {
 
     void setCurrentContainer(int container) {
         data.set(0,container);
+    }
+
+    public Container getContainerFromId(int id) {
+        if (tileEntities.get(id) instanceof Container) {
+            return (Container) tileEntities.get(id);
+        }
+        return null;
     }
 
      public int getCurrentContainer() {
